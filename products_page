@@ -1,0 +1,36 @@
+import 'package:flutter/material.dart';
+import 'product.dart';
+import 'product_card.dart';
+
+class ProductsPage extends StatefulWidget {
+  final List<Product> products;
+  final Function(Product) onAddToCart;
+
+  const ProductsPage(
+      {Key? key, required this.products, required this.onAddToCart})
+      : super(key: key);
+
+  @override
+  State<ProductsPage> createState() => _ProductsPageState();
+}
+
+class _ProductsPageState extends State<ProductsPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Produtos')),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: widget.products.length,
+        itemBuilder: (context, index) {
+          final p = widget.products[index];
+          return ProductCard(
+            product: p,
+            onTap: () => Navigator.pushNamed(context, '/product', arguments: p),
+            onAdd: () => widget.onAddToCart(p),
+          );
+        },
+      ),
+    );
+  }
+}
