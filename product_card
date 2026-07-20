@@ -1,0 +1,93 @@
+import 'package:flutter/material.dart';
+import 'product.dart';
+
+class ProductCard extends StatelessWidget {
+  final Product product;
+  final VoidCallback onTap;
+  final VoidCallback onAdd;
+
+  const ProductCard({
+    Key? key,
+    required this.product,
+    required this.onTap,
+    required this.onAdd,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final String imageUrl = (product.images.isNotEmpty)
+        ? product.images.first
+        : (product.imageUrl ?? '');
+
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Exibe imagem ou ícone de placeholder se não houver URL
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: imageUrl.isNotEmpty
+                    ? Image.network(
+                        imageUrl,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, progress) {
+                          if (progress == null) return child;
+                          return SizedBox(
+                            width: 80,
+                            height: 80,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: progress.expectedTotalBytes != null
+                                    ? progress.cumulativeBytesLoaded /
+                                        (progress.expectedTotalBytes ?? 1)
+                                    : null,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stack) => Container(
+                          width: 80,
+                          height: 80,
+                          color: Colors.grey[200],
+                          child: const Icon(Icons.broken_image, size: 36),
+                        ),
+                      )
+                    : Container(
+                        width: 80,
+                        height: 80,
+                        color: Colors.blue[200],
+                        child: const Icon(Icons.image_not_supported, size: 36),
+                      ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(product.name,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    Text(product.description,
+                        maxLines: 2, overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 6),
+                    Text('R\$ ${product.price.toStringAsFixed(2)}',
+                        style: const TextStyle(color: Colors.green)),
+                  ],
+                ),
+              ),
+              IconButton(
+                  onPressed: onAdd, icon: const Icon(Icons.add_shopping_cart)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
