@@ -1,0 +1,135 @@
+import 'dart:html';
+import 'dart:js';
+import 'dart:js_util';
+
+import 'package:flutter/material.dart';
+import 'product.dart';
+import 'home_page.dart';
+import 'products_page.dart';
+import 'product_detail_page.dart';
+import 'cart_page.dart';
+import 'tasks_page.dart';
+import 'task_form_page.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // Navigator key usado para exibir SnackBars a partir de métodos que não têm BuildContext direto
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  // Lista de produtos com múltiplas imagens (campo images)
+  final List<Product> products = [
+    Product(
+      id: 'p1',
+      name: 'Smartphone J X',
+      description: 'Tela 6.5", 128GB, câmera 48MP',
+      price: 1500.00,
+      images: [
+        'https://via.placeholder.com/800x800.png?text=Alpha+X+1',
+        'https://via.placeholder.com/800x800.png?text=Alpha+X+2',
+        'https://via.placeholder.com/800x800.png?text=Alpha+X+3',
+        'https://via.placeholder.com/800x800.png?text=Alpha+Pro+4',
+        'https://via.placeholder.com/800x800.png?text=Alpha+Pro+5',
+      ],
+    ),
+    Product(
+      id: 'p2',
+      name: 'Smartphone X pro',
+      description: 'Tela 6.1", 256GB, câmera 64MP',
+      price: 3299.00,
+      images: [
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+1',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+2',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+3',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+4',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+5',
+      ],
+    ),
+    Product(
+      id: 'p3',
+      name: 'Smartphone XX',
+      description: 'Tela 6.0", 256GB, câmera 75MP',
+      price: 1800.00,
+      images: [
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+1',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+2',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+3',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+4',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+5',
+      ],
+    ),
+    Product(
+      id: 'p4',
+      name: 'Smartphone Y',
+      description: 'Tela 6.0", 256GB, câmera 70MP',
+      price: 1900.00,
+      images: [
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+1',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+2',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+3',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+4',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+5',
+      ],
+    ),
+    Product(
+      id: 'p5',
+      name: 'Smartphone 2Y',
+      description: 'Tela 6.0", 256GB, câmera 80MP',
+      price: 2000.00,
+      images: [
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+1',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+2',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+3',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+4',
+        'https://via.placeholder.com/800x800.png?text=Beta+Pro+5',
+      ],
+    ),
+  ];
+
+  final List<Product> cart = [];
+
+  void addToCart(Product p) {
+    setState(() => cart.add(p));
+
+    final ctx = navigatorKey.currentContext;
+    if (ctx != null) {
+      ScaffoldMessenger.of(ctx).showSnackBar(
+        SnackBar(content: Text('${p.name} adicionado ao carrinho')),
+      );
+    } else {
+      // Fallback para desenvolvimento
+      // ignore: avoid_print
+      print(
+          '${p.name} adicionado ao carrinho (contexto não disponível para SnackBar)');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Smartpod',
+      navigatorKey: navigatorKey,
+      theme: ThemeData(primarySwatch: Colors.blue),
+      routes: {
+        '/': (_) => const HomePage(),
+        '/products': (_) =>
+            ProductsPage(products: products, onAddToCart: addToCart),
+        '/product': (_) => const ProductDetailPage(),
+        '/cart': (_) => CartPage(cart: cart),
+        '/tasks': (_) => const TasksPage(),
+        '/task_form': (_) => const TaskFormPage(),
+      },
+      initialRoute: '/',
+    );
+  }
+}
