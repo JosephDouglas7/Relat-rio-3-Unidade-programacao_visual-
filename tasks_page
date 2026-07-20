@@ -1,0 +1,95 @@
+import 'package:flutter/material.dart';
+import 'task.dart';
+import 'task_form_page.dart';
+import 'dart:math';
+
+class TasksPage extends StatefulWidget {
+  const TasksPage({Key? key}) : super(key: key);
+
+  @override
+  State<TasksPage> createState() => _TasksPageState();
+}
+
+class _TasksPageState extends State<TasksPage> {
+  final List<Task> tasks = [
+    Task(
+        id: 't1',
+        title: 'Revisar pedidos',
+        description: 'Verificar pagamentos e estoque'),
+    Task(
+        id: 't2',
+        title: 'Atualizar catálogo',
+        description: 'Adicionar novos modelos'),
+  ];
+
+  void _addOrUpdate(Task task) {
+    setState(() {
+      final idx = tasks.indexWhere((t) => t.id == task.id);
+      if (idx >= 0)
+        tasks[idx] = task;
+      else
+        tasks.add(task);
+    });
+  }
+
+  void _delete(String id) {
+    setState(() => tasks.removeWhere((t) => t.id == id));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Gerenciamento de tarefas')),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                final newTask = await Navigator.push<Task?>(
+                  context,
+                  MaterialPageRoute(builder: (_) => TaskFormPage(task: null)),
+                );
+                if (newTask != null) _addOrUpdate(newTask);
+              },
+              child: const Text('Criar Tarefa'),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: ListView.builder(
+                itemCount: tasks.length,
+                itemBuilder: (context, i) {
+                  final t = tasks[i];
+                  return ListTile(
+                    title: Text(t.title),
+                    subtitle: Text(t.description),
+                    leading: Checkbox(
+                      value: t.done,
+                      onChanged: (v) => setState(() => t.done = v ?? false),
+                    ),
+                    trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () async {
+                          final updated = await Navigator.push<Task?>(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => TaskFormPage(task: t)),
+                          );
+                          if (updated != null) _addOrUpdate(updated);
+                        },
+                      ),
+                      IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () => _delete(t.id)),
+                    ]),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
