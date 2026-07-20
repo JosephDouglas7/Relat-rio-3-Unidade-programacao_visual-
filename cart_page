@@ -1,0 +1,107 @@
+import 'package:flutter/material.dart';
+import 'product.dart';
+
+class CartPage extends StatelessWidget {
+  final List<Product> cart;
+
+  const CartPage({Key? key, required this.cart}) : super(key: key);
+
+  double get total => cart.fold(0.0, (double s, Product p) => s + p.price);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Carrinho')),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            Expanded(
+              child: cart.isEmpty
+                  ? const Center(child: Text('Seu carrinho está vazio'))
+                  : ListView.builder(
+                      itemCount: cart.length,
+                      itemBuilder: (context, i) {
+                        final p = cart[i];
+                        final imageUrl = (p.images.isNotEmpty)
+                            ? p.images.first
+                            : (p.imageUrl ?? '');
+
+                        return ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: imageUrl.isNotEmpty
+                                ? Image.network(
+                                    imageUrl,
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, progress) {
+                                      if (progress == null) return child;
+                                      return const SizedBox(
+                                        width: 50,
+                                        height: 50,
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stack) =>
+                                        Container(
+                                      width: 50,
+                                      height: 50,
+                                      color: Colors.grey[200],
+                                      child: const Icon(Icons.broken_image,
+                                          size: 24),
+                                    ),
+                                  )
+                                : Container(
+                                    width: 50,
+                                    height: 50,
+                                    color: Colors.blue[200],
+                                    child: const Icon(Icons.image_not_supported,
+                                        size: 24),
+                                  ),
+                          ),
+                          title: Text(p.name),
+                          subtitle: Text('R\$ ${p.price.toStringAsFixed(2)}'),
+                        );
+                      },
+                    ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total:',
+                  style: Theme.of(context).textTheme.titleMedium ??
+                      const TextStyle(fontSize: 16),
+                ),
+                Text('R\$ ${total.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: cart.isEmpty
+                    ? null
+                    : () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Compra simulada concluída')),
+                        );
+                      },
+                child: const Text('Finalizar Compra'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
