@@ -1,0 +1,17 @@
+class Product {
+  final String id;
+  final String name;
+  final String description;
+  final double price;
+  final String? imageUrl; // compatibilidade com código antigo
+  final List<String> images; // nova lista de imagens
+
+  Product({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.price,
+    this.imageUrl,
+    List<String>? images,
+  }) : images = images ?? (imageUrl != null ? [imageUrl] : []);
+}
