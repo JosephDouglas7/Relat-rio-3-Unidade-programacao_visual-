@@ -1,0 +1,70 @@
+import 'package:flutter/material.dart';
+import 'task.dart';
+import 'dart:math';
+
+class TaskFormPage extends StatefulWidget {
+  final Task? task;
+  const TaskFormPage({Key? key, this.task}) : super(key: key);
+
+  @override
+  State<TaskFormPage> createState() => _TaskFormPageState();
+}
+
+class _TaskFormPageState extends State<TaskFormPage> {
+  final _formKey = GlobalKey<FormState>();
+  late String title;
+  late String description;
+
+  @override
+  void initState() {
+    super.initState();
+    title = widget.task?.title ?? '';
+    description = widget.task?.description ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          title: Text(widget.task == null ? 'Nova Tarefa' : 'Editar Tarefa')),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                initialValue: title,
+                decoration: const InputDecoration(labelText: 'Título'),
+                validator: (v) =>
+                    (v == null || v.isEmpty) ? 'Informe um título' : null,
+                onSaved: (v) => title = v ?? '',
+              ),
+              TextFormField(
+                initialValue: description,
+                decoration: const InputDecoration(labelText: 'Descrição'),
+                onSaved: (v) => description = v ?? '',
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+                    final id = widget.task?.id ?? 't${Random().nextInt(10000)}';
+                    final task = Task(
+                        id: id,
+                        title: title,
+                        description: description,
+                        done: widget.task?.done ?? false);
+                    Navigator.pop(context, task);
+                  }
+                },
+                child: const Text('Salvar'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
